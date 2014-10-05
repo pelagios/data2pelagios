@@ -1,0 +1,12 @@
+@prefix : <http://flickr.com/palestineexplorationfund> .
+@prefix void: <http://rdfs.org/ns/void#> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+
+:pef a void:Dataset;
+  dcterms:title "The Palestine Exploration Fund";
+  dcterms:publisher "The Palestine Exploration Fund";
+  foaf:homepage <https://www.flickr.com/photos/palestineexplorationfund>;
+  dcterms:description "Flickr photostream of the Palestine Exploration Fund.";
+  dcterms:license <http://creativecommons.org/publicdomain/zero/1.0/>;
+  .
