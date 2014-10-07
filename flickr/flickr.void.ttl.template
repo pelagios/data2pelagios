@@ -4,9 +4,9 @@
 @prefix foaf: <http://xmlns.com/foaf/0.1/> .
 
 :pef a void:Dataset;
-  dcterms:title "The Palestine Exploration Fund";
-  dcterms:publisher "The Palestine Exploration Fund";
-  foaf:homepage <https://www.flickr.com/photos/palestineexplorationfund>;
-  dcterms:description "Flickr photostream of the Palestine Exploration Fund.";
+  dcterms:title "@@title@@";
+  dcterms:publisher "@@title@@";
+  foaf:homepage <https://www.flickr.com/photos/@@userID@@>;
+  dcterms:description "Flickr photostream of @@title@@.";
   dcterms:license <http://creativecommons.org/publicdomain/zero/1.0/>;
   .
