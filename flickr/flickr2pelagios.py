@@ -39,7 +39,7 @@ with open('api-key.txt', 'r') as key_file:
       if len(pleiades_tags) > 0:
         ctr_with_pleiades += 1
         annotations.write('<http://example.org/flickr/' + user_id + '.ttl#photos/' + photo_id + '> a pelagios:AnnotatedThing ;\n')
-        annotations.write('  dcterms:title "' + photo.get('title').replace('"', '\\"').encode('utf-8') + '" ;\n');  
+        annotations.write('  dcterms:title "' + photo.get('title').replace('"', '\\"').encode('utf-8')[:250]  + '" ;\n');  
         annotations.write('  foaf:homepage <http://www.flickr.com/photos/' + user_id + '/' + photo_id + '> ;\n')
       
         if photo.get('datetaken'):
