@@ -45,7 +45,7 @@ with open('api-key.txt', 'r') as key_file:
       
         if photo.get('datetaken'):
           year = photo.get('datetaken').split('-', 1)[0]
-          annotations.write('  dcterms:temporal "start=' + year + '" ;\n')
+          annotations.write('  dcterms:temporal "' + year + '" ;\n')
         
         if photo.get('latitude') and photo.get('longitude'):
           annotations.write('  dcterms:spatial [ geo:lat ' + photo.get('latitude') + ' ; geo:long ' + photo.get('longitude') + ' ] ;\n')
