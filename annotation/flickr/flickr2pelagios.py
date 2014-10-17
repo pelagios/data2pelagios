@@ -55,7 +55,8 @@ with open('api-key.txt', 'r') as key_file:
         for idx, pleiades_tag in enumerate(pleiades_tags):  
           annotations.write('<http://example.org/flickr/' + user_id + '.ttl#photos/' + photo_id + '/annotations/' + str(idx) + '> a oa:Annotation ;\n')
           annotations.write('  oa:hasTarget <http://example.org/flickr/' + user_id + '.ttl#photos/' + photo_id + '> ;\n')
-          annotations.write('  oa:hasBody <http://pleiades.stoa.org/places/' + pleiades_tag[17:] + '> ;\n')
+          
+          annotations.write('  oa:hasBody <http://pleiades.stoa.org/places/' + pleiades_tag[(pleiades_tag.rfind("=") + 1):] + '> ;\n')
           annotations.write('  .\n\n')
       
     annotations.close()
