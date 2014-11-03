@@ -10,8 +10,6 @@ with open('gazetteer_places_2013-12-06.json') as f:
   output.write('@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .\n')
   output.write('@prefix skos: <http://www.w3.org/2004/02/skos/core#> .\n')
   output.write('@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .\n\n')
-
-@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
   
   for line in f.readlines():
     record = json.loads(line)
