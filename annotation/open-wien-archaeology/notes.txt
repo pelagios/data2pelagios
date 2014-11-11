@@ -1,0 +1,8 @@
+11.11.2014
+http://data.wien.gv.at/daten/geo?service=WFS&request=GetFeature&version=1.1.0&typeName=ogdwien:FUNDPUNKTEOGD&srsName=EPSG:4326&outputFormat=csv
+
+The csv file from this address has two corrupt entries which have to be corrected before the converter can be executed. They have the object ids 623251 and 621602.
+
+Here are the corrected lines:
+FUNDPUNKTEOGD.623251,623251,POINT (16.37554927530442 48.20491447351594),1,Seilerst�tte,9,,Siedlungsbefund,"Mauerwerk, Tonfig�rchen, Tierknochen",Neuzeit,
+FUNDPUNKTEOGD.621602,621602,POINT (16.41336599605848 48.18171581650886),11,"B�rgerspitalwiese,Kreuzg.Fuchsr�hren-/Zippererstr.",,,"Einzel-, Streufund",Grenzstein,Neuzeit,
