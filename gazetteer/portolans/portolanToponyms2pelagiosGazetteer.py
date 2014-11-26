@@ -41,9 +41,31 @@ with open('PortolanPRECURSORS.csv') as f:
       nameOnChart = row[3]
       dateFirstSeen = toInt(row[5])
       dateLastSeen = toInt(row[10])
+      coastalSection = row[4]
+      chartMakerBlack = row[6]
+      chartMakerRed = row[8]
+      comments = row[23]
     
-      output.write('<http://www.example.org/portolans/record/' + idx + '> a lawd:Place ;\n')
+      output.write('<http://www.maphistory.info/portolans/record/' + idx + '> a lawd:Place ;\n')
       output.write('  rdfs:label "' + esc(nameOnChart) + '" ;\n')
+      
+      description = 'Portolan chart name'
+      if (coastalSection):
+        description += ', coastal section ' + coastalSection
+      else:
+        description += '.'
+        
+      if (chartMakerBlack):
+        description += ' Chartmaker (black name): ' + chartMakerBlack
+      if (chartMakerRed):
+        description += ', chartmaker (red name): ' + chartMakerRed + '.'
+      else:
+        description += '.'
+        
+      if (comments):
+        description += ' (' + comments + ')'
+        
+      output.write('  dcterms:description "' + esc(description) + '" ;\n')
     
       if (dateFirstSeen and dateLastSeen):
         output.write('  dcterms:temporal "<' + str(dateFirstSeen) + '/' + str(dateLastSeen) + '>" ;\n')
