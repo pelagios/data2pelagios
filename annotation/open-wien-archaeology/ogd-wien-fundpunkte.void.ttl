@@ -5,7 +5,7 @@
 
 :fundpunkte a void:Dataset;
   dcterms:title "Urban Archaeology Vienna Findspots";
-  dcterms:publisher "Museen der Stadt Wien - Stadtarch&auml;ologie";
+  dcterms:publisher "Museen der Stadt Wien - Stadtarchäologie";
   foaf:homepage <https://open.wien.at/site/datensatz/?id=cda1b8eb-40ef-4229-9417-2ba29ea816dd>;
   dcterms:description "Urban Archaeology Vienna findspots imported from the Vienna Open Data portal.";
   dcterms:license <https://creativecommons.org/licenses/by/3.0/at/deed.de>;
