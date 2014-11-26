@@ -29,14 +29,17 @@ with open('PortolanPRECURSORS.csv') as f:
   
   cnt_all = 0
   cnt_invalid = 0
+  idx = 0
   
   for row in reader:
+    idx += 1
+    
     if len(row) < 11:
       cnt_invalid += 1
     else:
       cnt_all += 1
     
-      idx = row[0]
+      sorting = row[0]
       modernName = row[2]
       nameOnChart = row[3]
       dateFirstSeen = toInt(row[5])
@@ -46,7 +49,7 @@ with open('PortolanPRECURSORS.csv') as f:
       chartMakerRed = row[8]
       comments = row[23]
     
-      output.write('<http://www.maphistory.info/portolans/record/' + idx + '> a lawd:Place ;\n')
+      output.write('<http://www.maphistory.info/portolans/record/' + str(idx) + '-' + sorting + '> a lawd:Place ;\n')
       output.write('  rdfs:label "' + esc(nameOnChart) + '" ;\n')
       
       description = 'Portolan chart name'
