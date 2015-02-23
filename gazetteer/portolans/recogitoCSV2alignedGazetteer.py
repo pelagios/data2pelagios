@@ -12,6 +12,12 @@ def toInt(chars):
     return toInt
   except ValueError:
     return None
+    
+def filterName(chars):
+  if ((not chars) or (chars == '|')):
+    return None
+  else:
+    return chars
 
 alignmentTable = {}
 
@@ -22,7 +28,8 @@ try:
     for row in reader:
       placeIdAndName = row[0].split(", ")
       closeMatch = row[1]
-      alignmentTable[placeIdAndName[0]] = { "name": placeIdAndName[1], "closeMatch": closeMatch }
+      if (len(placeIdAndName) > 1):
+        alignmentTable[placeIdAndName[0]] = { "name": placeIdAndName[1], "closeMatch": closeMatch }
 except IOError:
   print('closeMatch lookup file not found - result gazetteer will not include alignments')
 
@@ -62,6 +69,10 @@ with open('PortolanPRECURSORS.csv') as toponymList:
       coastalSection = row[4]
       chartMakerBlack = row[6]
       chartMakerRed = row[8]
+      nameGordyeyev = filterName(row[16])
+      namePujades = filterName(row[17])
+      nameLiberRiveriarum = filterName(row[18])
+      nameLoCompasso = filterName(row[19])
       comments = row[23]
       
       closeMatch = alignmentTable.get(str(idx) + '-' + sorting, False)
@@ -94,6 +105,18 @@ with open('PortolanPRECURSORS.csv') as toponymList:
     
       if (modernName):
         output.write('  lawd:hasName [ lawd:primaryForm "' + esc(modernName) + '" ] ;\n')
+        
+      if (nameGordyeyev):
+        output.write('  lawd:hasName [ lawd:primaryForm "' + esc(nameGordyeyev) + '" ] ;\n')
+        
+      if (namePujades):
+        output.write('  lawd:hasName [ lawd:primaryForm "' + esc(namePujades) + '" ] ;\n')
+        
+      if (nameLiberRiveriarum):
+        output.write('  lawd:hasName [ lawd:primaryForm "' + esc(nameLiberRiveriarum) + '" ] ;\n')
+        
+      if (nameLoCompasso):
+        output.write('  lawd:hasName [ lawd:primaryForm "' + esc(nameLoCompasso) + '" ] ;\n')
         
       if (closeMatch):
         output.write('  skos:closeMatch <' + closeMatch['closeMatch'] + '> ;\n')
