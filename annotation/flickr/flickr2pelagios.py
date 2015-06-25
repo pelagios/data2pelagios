@@ -3,6 +3,7 @@ import flickrapi
 
 with open('api-key.txt', 'r') as key_file:
   api_key = key_file.readline().strip()
+  api_secret = key_file.readline().strip()
     
   if len(sys.argv) < 3:
 	  print('Missing parameters. Usage: \'python flickr2pelagios.py <user-id> <title>\'')
@@ -15,13 +16,13 @@ with open('api-key.txt', 'r') as key_file:
   
   # Write VoID
   with open('flickr.void.ttl.template') as void_template:
-    void = open(user_id + '.void.ttl', 'w')
+    void = open('harvest/' + user_id + '.void.ttl', 'w')
     void.write(void_template.read().replace('@@title@@', stream_title).replace('@@userID@@', user_id))
     void.close()
     
     # Write annotations
-    flickr = flickrapi.FlickrAPI(api_key)
-    annotations = open(user_id + '.ttl', 'w')
+    flickr = flickrapi.FlickrAPI(api_key, api_secret)
+    annotations = open('harvest/' + user_id + '.ttl', 'w')
     annotations.write('@prefix dcterms: <http://purl.org/dc/terms/> .\n')  
     annotations.write('@prefix foaf: <http://xmlns.com/foaf/0.1/> .\n')
     annotations.write('@prefix geo: <http://www.w3.org/2003/01/geo/wgs84_pos#> .\n')
