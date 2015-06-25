@@ -41,7 +41,7 @@ with open('api-key.txt', 'r') as key_file:
         annotations.write('<http://example.org/flickr/' + user_id + '.ttl#photos/' + photo_id + '> a pelagios:AnnotatedThing ;\n')
         annotations.write('  dcterms:title "' + photo.get('title').replace('"', '\\"').encode('utf-8')[:250]  + '" ;\n');  
         annotations.write('  foaf:homepage <http://www.flickr.com/photos/' + user_id + '/' + photo_id + '> ;\n')
-        annotations.write('  foaf:thumbnail <http://farm' + photo.get('farm') + '.staticflickr.com/' + photo.get('server') + '/' + photo_id + '_' + photo.get('secret') + '.jpg> ;\n')
+        annotations.write('  foaf:depiction <http://farm' + photo.get('farm') + '.staticflickr.com/' + photo.get('server') + '/' + photo_id + '_' + photo.get('secret') + '.jpg> ;\n')
       
         if photo.get('datetaken'):
           year = photo.get('datetaken').split('-', 1)[0]
