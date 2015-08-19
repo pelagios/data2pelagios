@@ -3,9 +3,13 @@ import csv
 def esc(chars):
   return chars.replace('"','\'').replace('\\','')
 
-def writeName(name, language, output):
-  if (name):
-    output.write('  lawd:hasName [ lawd:primaryForm "' + esc(name) + '"@' + language + ' ] ;\n')
+def writeName(nameStr, language, output):
+  # Remove parentheses
+  charsToRemove = ['(', ')']
+  nameStr = nameStr.translate(None, ''.join(charsToRemove))
+  if (nameStr):
+    for name in nameStr.split(" - "):
+      output.write('  lawd:hasName [ lawd:primaryForm "' + esc(name) + '"@' + language + ' ] ;\n')
 
 with open('TM_Geo_Pelagios.csv') as f:
   output = open('trismegistos.ttl', 'w')
