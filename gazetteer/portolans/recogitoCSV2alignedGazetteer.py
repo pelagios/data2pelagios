@@ -25,11 +25,18 @@ alignmentTable = {}
 try:
   with open('Recogito_Download.csv') as alignmentList:
     reader = csv.reader(alignmentList, delimiter=';')
+    
+    alignmentCSV = open('portolanPRECURSORS_alignment.csv', 'w')
+    
     for row in reader:
       placeIdAndName = row[0].split(", ")
       closeMatch = row[1]
       if (len(placeIdAndName) > 1):
         alignmentTable[placeIdAndName[0]] = { "name": placeIdAndName[1], "closeMatch": closeMatch }
+        if (closeMatch):
+          alignmentCSV.write('http://www.maphistory.info/portolans/record/' + placeIdAndName[0] + ';' + placeIdAndName[1] + ';' + closeMatch + '\n')
+        
+    alignmentCSV.close()
 except IOError:
   print('closeMatch lookup file not found - result gazetteer will not include alignments')
 
@@ -123,5 +130,7 @@ with open('PortolanPRECURSORS.csv') as toponymList:
       
       output.write('  .\n\n')
     
-  print('Converted ' +  str(cnt_all) + ' places, ' + str(cnt_invalid) + ' invalid lines')
   output.close()
+  alignmentCSV.close()
+
+  print('Converted ' +  str(cnt_all) + ' places, ' + str(cnt_invalid) + ' invalid lines')
