@@ -29,7 +29,10 @@ def rewrite_annotations(concordances)
 
   # Just a simple string replace
   def rewrite_pastplace(place_body)
-    # TODO
+    qid = place_body["uri"][PASTPLACE_PREFIX.length .. -1]
+    wikidata_uri = WIKIDATA_PREFIX + qid
+    puts "  Rewriting #{place_body["uri"]} -> #{wikidata_uri}"
+    place_body["uri"] = wikidata_uri
   end
 
   # Rewrite fake maphist URIs through the concordance list
