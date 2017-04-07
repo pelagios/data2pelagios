@@ -1,84 +1,76 @@
-require 'csv'
 require 'json'
+require './concordances'
 
-@MAP_HIST_PREFIX = "http://www.maphistory.info/portolans/record/"
-
-def load_concordances
-  concordances = {}
-
-  csv_text = File.read("portolan_precursors_recogito.csv")
-  csv = CSV.parse(csv_text, :headers => true, :col_sep => ';')
-  csv.each do |row|
-    maphist_id = row[0].split('-')
-    maphist_sorting = maphist_id[1]
-    maphist_line_number = maphist_id[0]
-
-    mapped_uri = row[2]
-    status     = row[6]
-
-    if status == "VERIFIED" && !mapped_uri.empty?
-      record = {
-        'sorting'     => maphist_sorting,
-        'line_number' => maphist_line_number,
-        'uri'         => @MAP_HIST_PREFIX + row[0],
-        'mapped_uri'  => row[2],
-        'toponym'     => row[1]
-      }
-
-      existing_records = concordances[maphist_sorting]
-      if (existing_records.nil?)
-        concordances[maphist_sorting] = [record]
-      else
-        existing_records << record
-      end
-    end
-  end
-
-  concordances
-end
+MAP_HIST_PREFIX  = "http://www.maphistory.info/portolans/record/"
+PASTPLACE_PREFIX = "http://data.pastplace.org/search?q="
+WIKIDATA_PREFIX  = "http://www.wikidata.org/wiki/Q"
 
 def rewrite_annotations(concordances)
 
   def parseURI(uri)
-    id = uri[@MAP_HIST_PREFIX.length .. -1].split('-')
+    id = uri[MAP_HIST_PREFIX.length .. -1].split('-')
     { "sorting" => id[1], "line_number" => id[0] }
+  end
+
+  def getBody(bodies, hasType)
+    bodiesOfType = bodies.select do |b|
+      b["type"] == hasType
+    end
+
+    if bodiesOfType.length > 0
+      bodiesOfType[0]
+    end
+  end
+
+  # Type needs to be change from QUOTE to TRANSCRIPTION
+  def rewrite_quote(quote_body)
+    quote_body["type"] = "TRANSCRIPTION"
+  end
+
+  # Just a simple string replace
+  def rewrite_pastplace(place_body)
+    # TODO
+  end
+
+  # Rewrite fake maphist URIs through the concordance list
+  def rewrite_maphist(place_body, quote_body, concordances)
+    id = parseURI(place_body["uri"])
+    match = concordances.get(id['sorting'], id['line_number'], quote_body["value"])
+    if (match.nil?)
+      false
+    else
+      puts "  Rewriting #{place_body["uri"]} -> #{match}"
+      place_body["uri"] = match
+      true
+    end
   end
 
   def rewrite_one(annotation, concordances)
     rewritten = false
+
     bodies = annotation["bodies"]
-    placeBody = bodies.select do |b|
-      b["type"] == "PLACE"
+    quote_body = getBody(bodies, "QUOTE")
+    place_body = getBody(bodies, "PLACE")
+
+    if !quote_body.nil?
+      rewrite_quote(quote_body)
     end
 
-    if !placeBody.empty?
-      uri = placeBody[0]["uri"]
-      if !uri.nil? && uri.start_with?(@MAP_HIST_PREFIX)
-        id = parseURI(uri)
-        concordance = concordances[id['sorting']]
-        if (concordance.nil?)
-          # TODO what to do?
-          puts "No concordance found for #{uri}, #{id}"
-        elsif concordance.length == 1
-          # TODO replace
-          replacement = concordance[0]['mapped_uri']
-          offset = concordance[0]['line_number'].to_i - id['line_number'].to_i
-          if offset == 0
-            puts "SUPER exact match for #{uri} -> #{replacement}"
-          else
-            puts "Exact (offset #{offset}) match for #{uri} -> #{replacement}"
+    if !place_body.nil?
+      uri = place_body["uri"]
+      puts "  URI: #{uri}"
+      if !uri.nil?
+        if uri.start_with?(PASTPLACE_PREFIX)
+          rewrite_pastplace(place_body)
+          rewritten = true
+        elsif uri.start_with?(MAP_HIST_PREFIX)
+          rewritten = rewrite_maphist(place_body, quote_body, concordances)
+          if !rewritten
+            # TODO remove this body
           end
-          rewritten = true
-        else
-          puts "Multiple matches for #{uri}"
-          rewritten = true
         end
-
       end
     end
-
-    # TODO replace with concordance if available
-    # TODO or remove the Place body if not
 
     rewritten
   end
@@ -88,11 +80,13 @@ def rewrite_annotations(concordances)
   else
     filename = ARGV[0]
     File.open(filename, "r") do |f|
-      ctr = 0
+      ctr = [0, 0]
       f.each_line do |line|
+        ctr[0] += 1
+        puts "--Record #{ctr[0]} (#{ctr[1]} matches so far)"
         rewritten = rewrite_one(JSON.parse(line), concordances)
         if rewritten
-          ctr += 1
+          ctr[1] += 1
         end
       end
       puts "#{ctr} URIs rewritten"
@@ -100,5 +94,4 @@ def rewrite_annotations(concordances)
   end
 end
 
-concordances = load_concordances()
-rewrite_annotations(concordances)
+rewrite_annotations(Concordances.new("portolan_precursors_recogito.csv"))
