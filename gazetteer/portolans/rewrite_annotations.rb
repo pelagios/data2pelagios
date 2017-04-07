@@ -1,7 +1,5 @@
 require 'csv'
 
-input_file = ARGV
-
 def load_concordances
   concordances = {}
 
@@ -9,11 +7,11 @@ def load_concordances
   csv = CSV.parse(csv_text, :headers => true, :col_sep => ';')
   csv.each do |row|
     maphist_id = row[0]
-    mapped_id  = row[2]
+    mapped_uri = row[2]
     status     = row[6]
 
-    if status == 'VERIFIED' && !mapped_id.empty?
-      puts(maphist_id + ' -> ' + mapped_id)
+    if status == 'VERIFIED' && !mapped_uri.empty?
+      concordances['http://www.maphistory.info/portolans/record/' + maphist_id] = mapped_uri
     end
   end
 
@@ -21,6 +19,13 @@ def load_concordances
 end
 
 def rewrite_annotations(concordances)
+  if ARGV.empty?
+    puts('no input file')
+  else
+    # TODO read file, get all map_hist URIs
+    # TODO replace with concordance if available
+    # TODO or remove the Place body if not
+  end
 end
 
 concordances = load_concordances()
