@@ -10,36 +10,47 @@ class Concordances
     csv_text = File.read(filename)
     csv = CSV.parse(csv_text, :headers => true, :col_sep => ';')
     csv.each do |row|
-      maphist_id = row[0].split('-')
-      maphist_sorting = maphist_id[1]
+      maphist_id          = row[0].split('-')
+      maphist_sorting     = maphist_id[1]
       maphist_line_number = maphist_id[0]
-
-      mapped_uri = row[2]
-      status     = row[6]
+      toponym             = row[1]
+      mapped_uri          = row[2]
+      status              = row[6]
 
       if status == "VERIFIED" && !mapped_uri.empty?
-        record = {
-          "sorting"     => maphist_sorting,
-          "line_number" => maphist_line_number,
-          "uri"         => @@MAP_HIST_PREFIX + row[0],
-          "mapped_uri"  => row[2],
-          "toponym"     => row[1]
-        }
-
-        existing_records = @concordances[maphist_sorting]
-        if (existing_records.nil?)
-          @concordances[maphist_sorting] = [record]
-        else
-          existing_records << record
-        end
+        addRecord(maphist_sorting, maphist_line_number, toponym, mapped_uri)
       end
+    end
+
+    loadCorrections()
+  end
+
+  private def addRecord(sorting, line_number, toponym, mapped_uri)
+    record = {
+      "sorting"     => sorting,
+      "line_number" => line_number,
+      "mapped_uri"  => mapped_uri,
+      "toponym"     => toponym
+    }
+
+    existing_records = @concordances[sorting]
+    if (existing_records.nil?)
+      @concordances[sorting] = [record]
+    else
+      existing_records << record
     end
   end
 
-#pelagios_temp_id;maphist_label;recogito_mapping;recogito_gazetteer_label;lat;lng;recogito_status;modified_by;modified_at;
-#1-4;dumquergo / oquercas;http://www.wikidata.org/wiki/Q45797;DUINKERKE;51.0383;2.3775;VERIFIED;leif;2015-01-16T12:12:39+0100;
+  private def loadCorrections
+    if File.exist?("corrections.csv")
+      csv_text = File.read("corrections.csv")
+      csv = CSV.parse(csv_text, :headers => false, :col_sep => ';')
+      csv.each { |row| addRecord(row[0], row[1], row[2], row[3]) }
+    end
+  end
 
-  def storeCorrection(r, corrected_line)
+  private def storeCorrection(r, corrected_line)
+    addRecord(r["sorting"], corrected_line, r["toponym"], r["mapped_uri"])
     open('corrections.csv', 'a') do |f|
       f.puts "#{r["sorting"]};#{corrected_line};#{r["toponym"]};#{r["mapped_uri"]}"
     end
