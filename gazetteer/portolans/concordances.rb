@@ -36,6 +36,15 @@ class Concordances
     end
   end
 
+#pelagios_temp_id;maphist_label;recogito_mapping;recogito_gazetteer_label;lat;lng;recogito_status;modified_by;modified_at;
+#1-4;dumquergo / oquercas;http://www.wikidata.org/wiki/Q45797;DUINKERKE;51.0383;2.3775;VERIFIED;leif;2015-01-16T12:12:39+0100;
+
+  def storeCorrection(r, corrected_line)
+    open('corrections.csv', 'a') do |f|
+      f.puts "#{r["sorting"]};#{corrected_line};#{r["toponym"]};#{r["mapped_uri"]}"
+    end
+  end
+
   def get(sorting, line_number, toponym)
     matches = @concordances[sorting]
     if (matches.nil?)
@@ -60,6 +69,7 @@ class Concordances
 
         selection = $stdin.gets.chomp.to_i
         puts "  Returning selection #{selection}"
+        storeCorrection(matches[selection], line_number)
         matches[selection]["mapped_uri"]
       else
         # Exact match
