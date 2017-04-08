@@ -69,11 +69,13 @@ def rewrite_annotations(concordances)
         elsif uri.start_with?(MAP_HIST_PREFIX)
           rewritten = rewrite_maphist(place_body, quote_body, concordances)
           if !rewritten
-            # TODO remove this body
+            annotation["bodies"] = [quote_body]
           end
         end
       end
     end
+
+    open('out.jsonl', 'a') { |f| f.puts annotation.to_json }
 
     rewritten
   end
@@ -97,4 +99,5 @@ def rewrite_annotations(concordances)
   end
 end
 
+File.delete("out.jsonl") if File.exist?("out.jsonl")
 rewrite_annotations(Concordances.new("portolan_precursors_recogito.csv"))
