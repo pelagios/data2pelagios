@@ -24,7 +24,7 @@ class Concordances
 
     loadCorrections()
   end
-
+  
   private def addRecord(sorting, line_number, toponym, mapped_uri)
     record = {
       "sorting"     => sorting,
