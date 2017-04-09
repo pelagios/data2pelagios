@@ -1,13 +1,15 @@
 require 'csv'
 
-class Concordances
+class MaphistToWikidata
 
   @@MAP_HIST_PREFIX = "http://www.maphistory.info/portolans/record/"
 
-  def initialize(filename)
+  def initialize()
     @concordances = {}
 
-    csv_text = File.read(filename)
+    puts "Loading Maphist-Wikidata concordances"
+
+    csv_text = File.read("./concordances/data/maphist_to_wikidata.csv")
     csv = CSV.parse(csv_text, :headers => true, :col_sep => ';')
     csv.each do |row|
       maphist_id          = row[0].split('-')
@@ -22,9 +24,11 @@ class Concordances
       end
     end
 
+    puts "Done"
+
     loadCorrections()
   end
-  
+
   private def addRecord(sorting, line_number, toponym, mapped_uri)
     record = {
       "sorting"     => sorting,
@@ -42,16 +46,18 @@ class Concordances
   end
 
   private def loadCorrections
-    if File.exist?("corrections.csv")
-      csv_text = File.read("corrections.csv")
+    puts "Loading previous corrections"
+    if File.exist?("concordances/data/maphist_wikidata_corrections.csv")
+      csv_text = File.read("concordances/data/maphist_wikidata_corrections.csv")
       csv = CSV.parse(csv_text, :headers => false, :col_sep => ';')
       csv.each { |row| addRecord(row[0], row[1], row[2], row[3]) }
     end
+    puts "Done"
   end
 
   private def storeCorrection(r, corrected_line)
     addRecord(r["sorting"], corrected_line, r["toponym"], r["mapped_uri"])
-    open('corrections.csv', 'a') do |f|
+    open('concordances/data/maphist_wikidata_corrections.csv', 'a') do |f|
       f.puts "#{r["sorting"]};#{corrected_line};#{r["toponym"]};#{r["mapped_uri"]}"
     end
   end

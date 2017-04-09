@@ -1,25 +1,21 @@
 require 'json'
-require './concordances'
+require './base_rewriter'
+require './concordances/maphist_to_wikidata'
 
 MAP_HIST_PREFIX  = "http://www.maphistory.info/portolans/record/"
 PASTPLACE_PREFIX = "http://data.pastplace.org/search?q="
 WIKIDATA_PREFIX  = "http://www.wikidata.org/wiki/Q"
 
-def rewrite_annotations(concordances)
+class WikidataRewriter < BaseRewriter
 
-  def parseURI(uri)
-    id = uri[MAP_HIST_PREFIX.length .. -1].split('-')
-    { "sorting" => id[1], "line_number" => id[0] }
+  def initialize(outfile)
+    super(outfile)
+    @concordances = MaphistToWikidata.new
   end
 
-  def getBody(bodies, hasType)
-    bodiesOfType = bodies.select do |b|
-      b["type"] == hasType
-    end
-
-    if bodiesOfType.length > 0
-      bodiesOfType[0]
-    end
+  private def parseURI(uri)
+    id = uri[MAP_HIST_PREFIX.length .. -1].split('-')
+    { "sorting" => id[1], "line_number" => id[0] }
   end
 
   # Type needs to be change from QUOTE to TRANSCRIPTION
@@ -36,10 +32,11 @@ def rewrite_annotations(concordances)
   end
 
   # Rewrite fake maphist URIs through the concordance list
-  def rewrite_maphist(place_body, quote_body, concordances)
+  def rewrite_maphist(place_body, quote_body)
     id = parseURI(place_body["uri"])
-    match = concordances.get(id['sorting'], id['line_number'], quote_body["value"])
+    match = @concordances.get(id['sorting'], id['line_number'], quote_body["value"])
     if (match.nil?)
+      place_body.delete("uri")
       false
     else
       puts "  Rewriting #{place_body["uri"]} -> #{match}"
@@ -48,8 +45,11 @@ def rewrite_annotations(concordances)
     end
   end
 
-  def rewrite_one(annotation, concordances)
+  def rewrite_one(annotation)
     rewritten = false
+
+    puts "FOOOOOO"
+    puts @concordances
 
     bodies = annotation["bodies"]
     quote_body = getBody(bodies, "QUOTE")
@@ -67,10 +67,7 @@ def rewrite_annotations(concordances)
           rewrite_pastplace(place_body)
           rewritten = true
         elsif uri.start_with?(MAP_HIST_PREFIX)
-          rewritten = rewrite_maphist(place_body, quote_body, concordances)
-          if !rewritten
-            annotation["bodies"] = [quote_body]
-          end
+          rewritten = rewrite_maphist(place_body, quote_body)
         end
       end
     end
@@ -80,24 +77,6 @@ def rewrite_annotations(concordances)
     rewritten
   end
 
-  if ARGV.empty?
-    puts("no input file")
-  else
-    filename = ARGV[0]
-    File.open(filename, "r") do |f|
-      ctr = [0, 0]
-      f.each_line do |line|
-        ctr[0] += 1
-        puts "--Record #{ctr[0]} (#{ctr[1]} matches so far)"
-        rewritten = rewrite_one(JSON.parse(line), concordances)
-        if rewritten
-          ctr[1] += 1
-        end
-      end
-      puts "#{ctr} URIs rewritten"
-    end
-  end
 end
 
-File.delete("out.jsonl") if File.exist?("out.jsonl")
-rewrite_annotations(Concordances.new("portolan_precursors_recogito.csv"))
+WikidataRewriter.new("out-wikidata.jsonl").start()
