@@ -10,7 +10,7 @@ class WikidataRewriter < BaseRewriter
 
   def initialize(outfile)
     super(outfile)
-    @concordances = MaphistToWikidata.new
+    @concordances = WikidataToGeonames.new
   end
 
   private def parseURI(uri)
